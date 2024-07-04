@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,9 +12,10 @@ import (
 )
 
 type Proxy struct {
-	*gin.Engine
 	TargetURL *url.URL
 
+	proxy  *gin.Engine
+	webui  *gin.Engine
 	logger *log.Logger
 }
 
@@ -25,16 +27,21 @@ func NewProxy(target string) (*Proxy, error) {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := &Proxy{
-		Engine:    gin.New(),
 		TargetURL: targetURL,
+		proxy:     gin.New(),
+		webui:     gin.New(),
 		logger: log.NewWithOptions(os.Stdout, log.Options{
 			ReportCaller:    false,
 			ReportTimestamp: true,
 			TimeFormat:      time.Kitchen,
 			Prefix:          "🔍 ",
-		})}
-	r.Use(gin.Recovery())
-	r.Any("/*proxyPath", r.ProxyHandlerFunc())
+		}),
+	}
+
+	r.proxy.Use(gin.Recovery())
+	r.proxy.Any("/*proxyPath", r.ProxyHandlerFunc())
+	r.webui.Use(gin.Recovery())
+	r.webui.GET("/", r.WebuiHandlerFunc())
 
 	return r, nil
 }
@@ -57,6 +64,7 @@ func (p *Proxy) ProxyHandlerFunc() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send proxy request"})
 			return
 		}
+		defer resp.Body.Close()
 
 		p.logger.Info("Request proxied", "url", proxyURL.String(), "statusCode", resp.StatusCode)
 		for key, values := range resp.Header {
@@ -70,16 +78,41 @@ func (p *Proxy) ProxyHandlerFunc() gin.HandlerFunc {
 			p.logger.Errorf("Failed to copy response body: %v", err)
 			return
 		}
-
-		err = resp.Body.Close()
-		if err != nil {
-			p.logger.Errorf("Failed to close response body: %v", err)
-			return
-		}
 	}
 }
 
-func (p *Proxy) Run(addr string) error {
-	p.logger.Infof("Listening and serving proxy on %s", addr)
-	return p.Engine.Run(addr)
+func (p *Proxy) WebuiHandlerFunc() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+	}
+}
+
+func (p *Proxy) Run(addr string) {
+	stop := make(chan struct{})
+
+	go func() {
+		srv := &http.Server{Addr: addr, Handler: p.proxy}
+		p.logger.Infof("Proxy server started at %s", addr)
+		if err := srv.ListenAndServe(); err != nil {
+			p.logger.Fatalf("Failed to start proxy server: %v", err)
+		}
+	}()
+
+	go func() {
+		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		if err != nil {
+			p.logger.Errorf("Failed to start webui server: %v", err)
+			return
+		}
+		defer listener.Close()
+		webuiAddr := listener.Addr().String()
+
+		srv := &http.Server{Addr: webuiAddr, Handler: p.webui}
+		p.logger.Infof("Webui server started at %s", webuiAddr)
+		if err := srv.Serve(listener); err != nil {
+			p.logger.Fatalf("Failed to start webui server: %v", err)
+		}
+	}()
+
+	<-stop
 }
