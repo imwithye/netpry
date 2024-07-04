@@ -26,7 +26,7 @@ func NewProxy(target string) (*Proxy, error) {
 		return nil, err
 	}
 
-	db, err := db.NewDB()
+	database, err := db.NewDB()
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +35,11 @@ func NewProxy(target string) (*Proxy, error) {
 	r := &Proxy{
 		TargetURL: targetURL,
 
-		db:    db,
+		db:    database,
 		proxy: gin.New(),
 		webui: gin.New(),
 		logger: log.NewWithOptions(os.Stdout, log.Options{
+			Level:           log.DebugLevel,
 			ReportCaller:    false,
 			ReportTimestamp: true,
 			TimeFormat:      time.Kitchen,
@@ -46,9 +47,9 @@ func NewProxy(target string) (*Proxy, error) {
 		}),
 	}
 
-	r.proxy.Use(gin.Recovery())
+	r.proxy.Use(r.logMiddleware("proxy", false), gin.Recovery())
 	r.proxy.Any("/*proxyPath", r.proxyHandler())
-	r.webui.Use(gin.Recovery())
+	r.webui.Use(r.logMiddleware("webui", true), gin.Recovery())
 	r.webui.GET("/", r.webuiHandler())
 
 	return r, nil
