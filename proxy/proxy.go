@@ -41,7 +41,7 @@ func NewProxy(target string) (*Proxy, error) {
 	r.proxy.Use(gin.Recovery())
 	r.proxy.Any("/*proxyPath", r.ProxyHandlerFunc())
 	r.webui.Use(gin.Recovery())
-	r.webui.GET("/", r.WebuiHandlerFunc())
+	r.webui.GET("/", r.webuiHandler())
 
 	return r, nil
 }
@@ -78,12 +78,6 @@ func (p *Proxy) ProxyHandlerFunc() gin.HandlerFunc {
 			p.logger.Errorf("Failed to copy response body: %v", err)
 			return
 		}
-	}
-}
-
-func (p *Proxy) WebuiHandlerFunc() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 	}
 }
 
