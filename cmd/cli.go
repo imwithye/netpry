@@ -1,7 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"github.com/imwithye/netpry/proxy"
+	"log"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	p, err := proxy.NewProxy("https://google.com")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
+	err = p.Run(":9080")
+	if err != nil {
+		log.Fatalln(err)
+		return
+	}
 }
