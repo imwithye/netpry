@@ -3,6 +3,7 @@ package proxy
 import (
 	"github.com/charmbracelet/log"
 	"github.com/gin-gonic/gin"
+	"github.com/imwithye/netpry/db"
 	"net"
 	"net/http"
 	"net/url"
@@ -13,6 +14,7 @@ import (
 type Proxy struct {
 	TargetURL *url.URL
 
+	db     *db.DB
 	proxy  *gin.Engine
 	webui  *gin.Engine
 	logger *log.Logger
@@ -24,11 +26,18 @@ func NewProxy(target string) (*Proxy, error) {
 		return nil, err
 	}
 
+	db, err := db.NewDB()
+	if err != nil {
+		return nil, err
+	}
+
 	gin.SetMode(gin.ReleaseMode)
 	r := &Proxy{
 		TargetURL: targetURL,
-		proxy:     gin.New(),
-		webui:     gin.New(),
+
+		db:    db,
+		proxy: gin.New(),
+		webui: gin.New(),
 		logger: log.NewWithOptions(os.Stdout, log.Options{
 			ReportCaller:    false,
 			ReportTimestamp: true,
