@@ -1,14 +1,15 @@
 package proxy
 
 import (
-	"github.com/charmbracelet/log"
-	"github.com/gin-gonic/gin"
-	"github.com/imwithye/netpry/db"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
+
+	"github.com/charmbracelet/log"
+	"github.com/gin-gonic/gin"
+	"github.com/imwithye/netpry/db"
 )
 
 type Proxy struct {
@@ -47,10 +48,10 @@ func NewProxy(target string) (*Proxy, error) {
 		}),
 	}
 
-	r.proxy.Use(r.logMiddleware("proxy", false), gin.Recovery())
+	r.proxy.Use(r.logMiddleware("proxy"), gin.Recovery())
 	r.proxy.Any("/*proxyPath", r.proxyHandler())
-	r.webui.Use(r.logMiddleware("webui", true), gin.Recovery())
-	r.webui.GET("/", r.webuiHandler())
+	r.webui.Use(r.logMiddleware("webui"), gin.Recovery())
+	r.webui.GET("/*webuiPath", r.webuiHandler())
 
 	return r, nil
 }
@@ -59,9 +60,17 @@ func (p *Proxy) Run(addr string) {
 	stop := make(chan struct{})
 
 	go func() {
-		srv := &http.Server{Addr: addr, Handler: p.proxy}
-		p.logger.Infof("Proxy server started at %s", addr)
-		if err := srv.ListenAndServe(); err != nil {
+		listener, err := net.Listen("tcp", addr)
+		if err != nil {
+			p.logger.Errorf("Failed to start proxy server: %v", err)
+			return
+		}
+		defer listener.Close()
+		proxyAddr := listener.Addr().String()
+
+		srv := &http.Server{Addr: proxyAddr, Handler: p.proxy}
+		p.logger.Infof("Proxy server started at http://%s", proxyAddr)
+		if err := srv.Serve(listener); err != nil {
 			p.logger.Fatalf("Failed to start proxy server: %v", err)
 		}
 	}()
@@ -76,7 +85,7 @@ func (p *Proxy) Run(addr string) {
 		webuiAddr := listener.Addr().String()
 
 		srv := &http.Server{Addr: webuiAddr, Handler: p.webui}
-		p.logger.Infof("Webui server started at %s", webuiAddr)
+		p.logger.Infof("Webui server started at http://%s", webuiAddr)
 		if err := srv.Serve(listener); err != nil {
 			p.logger.Fatalf("Failed to start webui server: %v", err)
 		}

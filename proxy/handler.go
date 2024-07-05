@@ -2,11 +2,12 @@ package proxy
 
 import (
 	"embed"
-	"github.com/gin-gonic/gin"
 	"io"
 	"io/fs"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
 //go:embed _webui/dist
@@ -14,6 +15,7 @@ var embedWebuiFS embed.FS
 
 func (p *Proxy) webuiHandler() gin.HandlerFunc {
 	subFS, _ := fs.Sub(embedWebuiFS, "_webui/dist")
+	httpFS := http.FileServer(http.FS(subFS))
 	return func(c *gin.Context) {
 		fp := strings.TrimPrefix(c.Request.URL.Path, "/")
 		req := c.Request.Clone(c.Request.Context())
@@ -21,8 +23,7 @@ func (p *Proxy) webuiHandler() gin.HandlerFunc {
 		if err != nil {
 			req.URL.Path = "/"
 		}
-		fs := http.FileServer(http.FS(subFS))
-		fs.ServeHTTP(c.Writer, req)
+		httpFS.ServeHTTP(c.Writer, req)
 	}
 }
 
