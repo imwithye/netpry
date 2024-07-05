@@ -38,7 +38,7 @@ func (p *Proxy) proxyHandler() gin.HandlerFunc {
 		}
 		req.Header = c.Request.Header
 
-		client := &http.Client{}
+		client := NewHttpClient()
 		resp, err := client.Do(req)
 		if err != nil {
 			p.logger.Errorf("Failed to send proxy request: %v", err)
