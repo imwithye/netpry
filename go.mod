@@ -3,6 +3,7 @@ module github.com/imwithye/netpry
 go 1.22.5
 
 require (
+	github.com/alecthomas/kingpin/v2 v2.4.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/gin-gonic/gin v1.10.0
 	gorm.io/driver/sqlite v1.5.6
@@ -10,6 +11,7 @@ require (
 )
 
 require (
+	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -40,6 +42,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
+	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect

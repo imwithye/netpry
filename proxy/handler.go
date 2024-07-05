@@ -29,7 +29,7 @@ func (p *Proxy) webuiHandler() gin.HandlerFunc {
 
 func (p *Proxy) proxyHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		proxyURL := p.TargetURL.ResolveReference(c.Request.URL)
+		proxyURL := p.proxyTargetURL.ResolveReference(c.Request.URL)
 		req, err := http.NewRequest(c.Request.Method, proxyURL.String(), c.Request.Body)
 		if err != nil {
 			p.logger.Errorf("Failed to create proxy request: %v", err)

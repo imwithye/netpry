@@ -13,7 +13,9 @@ import (
 )
 
 type Proxy struct {
-	TargetURL *url.URL
+	proxyTargetURL *url.URL
+	proxyAddr      string
+	webuiAddr      string
 
 	db     *db.DB
 	proxy  *gin.Engine
@@ -21,12 +23,7 @@ type Proxy struct {
 	logger *log.Logger
 }
 
-func NewProxy(target string) (*Proxy, error) {
-	targetURL, err := url.Parse(target)
-	if err != nil {
-		return nil, err
-	}
-
+func NewProxy(proxyTargetURL *url.URL, proxyAddr, webuiAddr string) (*Proxy, error) {
 	database, err := db.NewDB()
 	if err != nil {
 		return nil, err
@@ -34,7 +31,9 @@ func NewProxy(target string) (*Proxy, error) {
 
 	gin.SetMode(gin.ReleaseMode)
 	r := &Proxy{
-		TargetURL: targetURL,
+		proxyTargetURL: proxyTargetURL,
+		proxyAddr:      proxyAddr,
+		webuiAddr:      webuiAddr,
 
 		db:    database,
 		proxy: gin.New(),
@@ -56,27 +55,9 @@ func NewProxy(target string) (*Proxy, error) {
 	return r, nil
 }
 
-func (p *Proxy) Run(addr string) {
-	stop := make(chan struct{})
-
+func (p *Proxy) Run() {
 	go func() {
-		listener, err := net.Listen("tcp", addr)
-		if err != nil {
-			p.logger.Errorf("Failed to start proxy server: %v", err)
-			return
-		}
-		defer listener.Close()
-		proxyAddr := listener.Addr().String()
-
-		srv := &http.Server{Addr: proxyAddr, Handler: p.proxy}
-		p.logger.Infof("Proxy server started at http://%s", proxyAddr)
-		if err := srv.Serve(listener); err != nil {
-			p.logger.Fatalf("Failed to start proxy server: %v", err)
-		}
-	}()
-
-	go func() {
-		listener, err := net.Listen("tcp", "127.0.0.1:0")
+		listener, err := net.Listen("tcp", p.webuiAddr)
 		if err != nil {
 			p.logger.Errorf("Failed to start webui server: %v", err)
 			return
@@ -91,5 +72,17 @@ func (p *Proxy) Run(addr string) {
 		}
 	}()
 
-	<-stop
+	listener, err := net.Listen("tcp", p.proxyAddr)
+	if err != nil {
+		p.logger.Errorf("Failed to start proxy server: %v", err)
+		return
+	}
+	defer listener.Close()
+	proxyAddr := listener.Addr().String()
+
+	srv := &http.Server{Addr: proxyAddr, Handler: p.proxy}
+	p.logger.Infof("Proxy http://%s --> %s", proxyAddr, p.proxyTargetURL.String())
+	if err := srv.Serve(listener); err != nil {
+		p.logger.Fatalf("Failed to start proxy server: %v", err)
+	}
 }
