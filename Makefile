@@ -6,4 +6,8 @@ deps:
 	cd proxy/_webui && pnpm install
 	go get ./...
 
-.PHONY: build deps
+fmt:
+	cd proxy/_webui && pnpm run format
+	go fmt ./...
+
+.PHONY: build deps fmt
