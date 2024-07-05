@@ -10,4 +10,8 @@ fmt:
 	cd proxy/_webui && pnpm run format
 	go fmt ./...
 
-.PHONY: build deps fmt
+lint:
+	cd proxy/_webui && pnpm run lint
+	golangci-lint run --fix
+
+.PHONY: build deps fmt lint

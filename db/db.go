@@ -1,9 +1,10 @@
 package db
 
 import (
+	"net/http"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 const inMemoryConnection = "file::memory:?cache=shared"
@@ -28,7 +29,11 @@ func NewDB() (*DB, error) {
 		return nil, err
 	}
 
-	db.AutoMigrate(&Request{})
+	err = db.AutoMigrate(&Request{})
+	if err != nil {
+		return nil, err
+	}
+
 	return &DB{db}, nil
 }
 
