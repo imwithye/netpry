@@ -4,7 +4,7 @@
 
     <div class="flex-grow w-full">
       <div class="w-full h-full flex">
-        <RequestList class="w-1/3 border-r" />
+        <RequestList class="w-1/3" />
         <RequestDetail class="w-2/3" />
       </div>
     </div>
