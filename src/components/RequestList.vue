@@ -11,9 +11,9 @@
           <el-tag>{{ scope.row.method }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="url" label="URL">
+      <el-table-column prop="uri" label="URL">
         <template #default="scope">
-          <div>{{ scope.row.url }}</div>
+          <div>{{ scope.row.uri }}</div>
         </template>
       </el-table-column>
     </el-table>

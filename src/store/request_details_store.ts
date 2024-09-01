@@ -2,8 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export interface RequestDetails {
+  uuid: string
   method: string
-  url: string
+  uri: string,
+  status_code: number | null;
+  request_headers: { [key: string]: string },
+  response_headers: { [key: string]: string },
+  start_time: string
+  end_time: string | null
 }
 
 export const useRequestDetailsStore = defineStore('requestDetails', () => {
