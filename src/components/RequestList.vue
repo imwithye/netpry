@@ -1,6 +1,11 @@
 <template>
   <div class="w-full h-full overflow-hidden">
-    <el-table class="w-full" :data="requests">
+    <el-table
+      class="w-full"
+      :data="requestDetailsStore.requestDetailsList"
+      row-class-name="cursor-pointer"
+      @row-click="(row: RequestDetails) => setActivatedRequestDetails(row)"
+    >
       <el-table-column prop="method" label="Method" width="80" min-width="80">
         <template #default="scope">
           <el-tag>{{ scope.row.method }}</el-tag>
@@ -16,23 +21,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { RequestDetails, useRequestDetailsStore } from '../store/request_details_store.ts'
 
-const requests = ref([
-  {
-    method: 'GET',
-    url: 'https://google.com',
-    status: 200
-  },
-  {
-    method: 'GET',
-    url: 'https://google.com',
-    status: 200
-  },
-  {
-    method: 'GET',
-    url: 'https://google.com',
-    status: 200
-  }
-])
+const requestDetailsStore = useRequestDetailsStore()
+
+const setActivatedRequestDetails = (row: RequestDetails) => {
+  const req: RequestDetails = JSON.parse(JSON.stringify(row))
+  requestDetailsStore.setActiveRequestDetails(req)
+}
 </script>
