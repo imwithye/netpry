@@ -3,6 +3,21 @@ use time::serde::rfc3339;
 use time::OffsetDateTime;
 use uuid::Uuid;
 
+mod base64_serde {
+    use base64::Engine;
+    use serde::Serialize;
+    use serde::Serializer;
+
+    pub fn serialize<S: Serializer>(v: &Option<Vec<u8>>, s: S) -> Result<S::Ok, S::Error> {
+        if let Some(v) = v {
+            let base64 = base64::prelude::BASE64_STANDARD.encode(v);
+            String::serialize(&base64, s)
+        } else {
+            s.serialize_none()
+        }
+    }
+}
+
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct RequestDetails {
     uuid: Uuid,
@@ -22,6 +37,12 @@ pub struct RequestDetails {
     #[serde(with = "http_serde::option::header_map")]
     pub response_headers: Option<HeaderMap>,
 
+    #[serde(with = "base64_serde")]
+    pub request_body: Option<Vec<u8>>,
+
+    #[serde(with = "base64_serde")]
+    pub response_body: Option<Vec<u8>>,
+
     #[serde(with = "rfc3339")]
     pub start_time: OffsetDateTime,
 
@@ -38,6 +59,8 @@ impl RequestDetails {
             status_code: None,
             request_headers: HeaderMap::new(),
             response_headers: None,
+            request_body: Some(vec![104, 101, 108, 108, 111]),
+            response_body: None,
             start_time: OffsetDateTime::now_utc(),
             end_time: None,
         }

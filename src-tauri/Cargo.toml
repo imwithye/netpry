@@ -11,17 +11,18 @@ edition = "2021"
 tauri-build = { version = "1", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = ["shell-open"] }
+actix-web = "4"
+base64 = "0.22.1"
+futures = "0.3.30"
+http = "1.1.0"
+http-serde = "2.1.1"
+reqwest = "0.12"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-uuid = { version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics", "serde"] }
-tokio = { version = "1", features = ["full"] }
-actix-web = "4"
-reqwest = "0.12"
-futures = "0.3.30"
+tauri = { version = "1", features = ["shell-open"] }
 time = {  version = "0.3.36", features = ["serde"] }
-http-serde = "2.1.1"
-http = "1.1.0"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics", "serde"] }
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
