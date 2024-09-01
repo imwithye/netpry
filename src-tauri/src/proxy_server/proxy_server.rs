@@ -81,17 +81,35 @@ impl ProxyServer {
             .await
             .map_err(actix_web::error::ErrorInternalServerError)?;
 
-        let status: actix_web::http::StatusCode = resp.status().as_str().parse()?;
-        let mut client_resp = HttpResponse::build(status);
+        let status_code = resp.status();
+        request_details.status_code = Some(status_code.clone());
+
+        let status_code: actix_web::http::StatusCode = status_code.as_str().parse()?;
+        let mut client_resp = HttpResponse::build(status_code);
+        let mut response_headers = HeaderMap::new();
         for (name, value) in resp.headers().iter() {
-            let header_name: &str = name.as_str();
-            let header_value: &[u8] = value.as_bytes();
+            let header_name: HeaderName = name.as_str().parse()?;
+            let header_value: HeaderValue = HeaderValue::from_bytes(value.as_bytes())?;
+            response_headers.insert(header_name.clone(), header_value.clone());
+
+            let header_name: actix_web::http::header::HeaderName = name.as_str().parse()?;
+            let header_value: actix_web::http::header::HeaderValue =
+                actix_web::http::header::HeaderValue::from_bytes(value.as_bytes())?;
             client_resp.append_header((header_name, header_value));
         }
+        request_details.response_headers = Some(response_headers);
+
         let body = resp
             .bytes()
             .await
             .map_err(actix_web::error::ErrorInternalServerError)?;
+        request_details.end_time = Some(time::OffsetDateTime::now_utc());
+
+        store
+            .read()
+            .map_err(|_| "Failed to acquire read lock")?
+            .send(request_details.clone())
+            .await;
 
         Ok(client_resp.body(body))
     }
