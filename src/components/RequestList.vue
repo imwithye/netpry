@@ -1,5 +1,8 @@
 <template>
-  <div class="h-full border-t border-b overflow-hidden">
+  <div
+    class="h-full border-t border-b overflow-hidden"
+    style="border-color: var(--el-border-color)"
+  >
     <el-table
       class="w-full"
       :data="requestDetailsStore.requestDetailsList"
