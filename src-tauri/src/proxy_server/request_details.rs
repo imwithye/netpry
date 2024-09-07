@@ -59,7 +59,7 @@ impl RequestDetails {
             status_code: None,
             request_headers: HeaderMap::new(),
             response_headers: None,
-            request_body: Some(vec![104, 101, 108, 108, 111]),
+            request_body: None,
             response_body: None,
             start_time: OffsetDateTime::now_utc(),
             end_time: None,

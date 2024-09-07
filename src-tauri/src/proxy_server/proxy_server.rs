@@ -67,7 +67,9 @@ impl ProxyServer {
                 .insert(header_name.clone(), header_value.clone());
         }
         if let Some(chunk) = payload.next().await {
-            forward_req = forward_req.body(chunk?);
+            let body = chunk?;
+            request_details.request_body = Some(body.to_vec());
+            forward_req = forward_req.body(body);
         }
 
         store
@@ -103,6 +105,7 @@ impl ProxyServer {
             .bytes()
             .await
             .map_err(actix_web::error::ErrorInternalServerError)?;
+        request_details.response_body = Some(body.to_vec());
         request_details.end_time = Some(time::OffsetDateTime::now_utc());
 
         store
