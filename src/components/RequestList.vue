@@ -11,12 +11,17 @@
     >
       <el-table-column prop="method" label="Method" width="80" min-width="80">
         <template #default="scope">
-          <el-tag>{{ scope.row.method }}</el-tag>
+          <MethodTag :method="scope.row.method" :status_code="scope.row.status_code" />
         </template>
       </el-table-column>
       <el-table-column prop="uri" label="URL">
         <template #default="scope">
-          <div>{{ scope.row.uri }}</div>
+          <URI :uri="scope.row.uri" />
+        </template>
+      </el-table-column>
+      <el-table-column prop="status_code" label="Status" width="80" min-width="80">
+        <template #default="scope">
+          <div class="text-xs font-mono">{{ scope.row.status_code }}</div>
         </template>
       </el-table-column>
     </el-table>
@@ -25,6 +30,8 @@
 
 <script lang="ts" setup>
 import { RequestDetails, useRequestDetailsStore } from '../store/request_details_store.ts'
+import MethodTag from './MethodTag.vue'
+import URI from './URI.vue'
 
 const requestDetailsStore = useRequestDetailsStore()
 
