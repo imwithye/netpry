@@ -1,41 +1,37 @@
 <template>
   <Section title="General">
-    <table>
-      <tbody>
-        <tr>
-          <td class="key">Request URL:</td>
-          <td class="value">{{ requestDetails.uri }}</td>
-        </tr>
-        <tr>
-          <td class="key">Request Method:</td>
-          <td class="value">{{ requestDetails.method }}</td>
-        </tr>
-        <tr>
-          <td class="key">Status Code:</td>
-          <td class="value">{{ requestDetails.status_code }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="flex align-top">
+      <div class="key">Request URL:</div>
+      <div class="value">{{ requestDetails.uri }}</div>
+    </div>
+    <div class="flex align-top">
+      <div class="key">Request Method:</div>
+      <div class="value">{{ requestDetails.method }}</div>
+    </div>
+    <div class="flex align-top">
+      <div class="key">Status Code:</div>
+      <div class="value">{{ requestDetails.status_code }}</div>
+    </div>
   </Section>
   <Section title="Request Headers">
-    <table>
-      <tbody>
-        <tr v-for="(key, idx) in Object.keys(requestDetails.request_headers)" :key="idx">
-          <td class="key">{{ key }}:</td>
-          <td class="value">{{ requestDetails.request_headers[key] }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div
+      class="flex align-top"
+      v-for="(key, idx) in Object.keys(requestDetails.request_headers)"
+      :key="idx"
+    >
+      <div class="key">{{ key }}:</div>
+      <div class="value">{{ requestDetails.request_headers[key] }}</div>
+    </div>
   </Section>
   <Section title="Response Headers">
-    <table>
-      <tbody>
-        <tr v-for="(key, idx) in Object.keys(requestDetails.response_headers)" :key="idx">
-          <td class="key">{{ key }}:</td>
-          <td class="value">{{ requestDetails.request_headers[key] }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div
+      class="flex align-top"
+      v-for="(key, idx) in Object.keys(requestDetails.response_headers)"
+      :key="idx"
+    >
+      <div class="key">{{ key }}:</div>
+      <div class="value">{{ requestDetails.response_headers[key] }}</div>
+    </div>
   </Section>
 </template>
 
@@ -50,11 +46,10 @@ const requestDetails = computed(() => requestDetailsStore.activatedRequestDetail
 
 <style scoped>
 .key {
-  vertical-align: top;
+  min-width: 200px;
   width: 200px;
 }
 
 .value {
-  vertical-align: top;
 }
 </style>
