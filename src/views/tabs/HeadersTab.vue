@@ -17,8 +17,26 @@
       </tbody>
     </table>
   </Section>
-  <Section title="Request Headers" />
-  <Section title="Response Headers" />
+  <Section title="Request Headers">
+    <table>
+      <tbody>
+        <tr v-for="(key, idx) in Object.keys(requestDetails.request_headers)" :key="idx">
+          <td class="key">{{ key }}:</td>
+          <td class="value">{{ requestDetails.request_headers[key] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </Section>
+  <Section title="Response Headers">
+    <table>
+      <tbody>
+        <tr v-for="(key, idx) in Object.keys(requestDetails.response_headers)" :key="idx">
+          <td class="key">{{ key }}:</td>
+          <td class="value">{{ requestDetails.request_headers[key] }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </Section>
 </template>
 
 <script setup lang="ts">
