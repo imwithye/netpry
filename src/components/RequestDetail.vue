@@ -9,7 +9,9 @@
     <el-tab-pane class="no-padding" label="Preview">
       <PreviewTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane class="no-padding" label="Response">Response</el-tab-pane>
+    <el-tab-pane class="no-padding" label="Response">
+      <ResponseTab v-if="requestDetails" />
+    </el-tab-pane>
   </el-tabs>
 </template>
 
@@ -17,6 +19,7 @@
 import HeadersTab from '../views/tabs/HeadersTab.vue'
 import PayloadTab from '../views/tabs/PayloadTab.vue'
 import PreviewTab from '../views/tabs/PreviewTab.vue'
+import ResponseTab from '../views/tabs/ResponseTab.vue'
 
 import { computed } from 'vue'
 import { useRequestDetailsStore } from '../store/request_details_store'
