@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import Samples from '../assets/samples.json'
 
 export interface RequestDetails {
   uuid: string
@@ -16,7 +17,7 @@ export const useRequestDetailsStore = defineStore('requestDetails', () => {
   const requestDetailsMap = new Map<string, number>()
 
   const activatedRequestDetails = ref<RequestDetails | null>(null)
-  const requestDetailsList = ref<Array<RequestDetails>>([])
+  const requestDetailsList = ref<Array<RequestDetails>>(Samples as unknown as Array<RequestDetails>)
 
   function addRequestDetails(requestDetails: RequestDetails) {
     if (!requestDetails) return
@@ -26,7 +27,7 @@ export const useRequestDetailsStore = defineStore('requestDetails', () => {
       requestDetailsList.value.push(requestDetails)
       return
     }
-    const idx = requestDetailsMap.get(requestDetails.uuid)
+    const idx = requestDetailsMap.get(requestDetails.uuid) as number
     requestDetailsList.value[idx] = requestDetails
   }
 
