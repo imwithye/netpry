@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full h-full overflow-hidden">
+  <div class="h-full overflow-hidden">
     <el-table
       class="w-full"
       :data="requestDetailsStore.requestDetailsList"
