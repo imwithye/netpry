@@ -8,10 +8,10 @@
       <span>netpry - network inspection</span>
     </div>
     <div>
-      <el-switch class="theme-switch" v-model="darkMode">
+      <el-switch class="theme-switch" v-model="isDark" @change="toggleDark">
         <template #active-action>
           <el-icon>
-            <Moon class="text-gray-800" />
+            <Moon class="text-gray-200" />
           </el-icon>
         </template>
         <template #inactive-action>
@@ -25,16 +25,20 @@
 </template>
 
 <script setup lang="ts">
+import { useDark, useToggle } from '@vueuse/core'
 import { Histogram, Sunny, Moon } from '@element-plus/icons-vue'
-import { ref } from 'vue'
 
-const darkMode = ref(false)
+const isDark = useDark({
+  disableTransition: false
+})
+const toggleDark = useToggle(isDark)
 </script>
 
 <style scoped>
 .theme-switch {
-  --el-switch-on-color: #f2f2f2;
+  --el-switch-on-color: #2c2c2c;
   --el-switch-off-color: #f2f2f2;
   --el-switch-border-color: var(--el-border-color);
+  --el-color-white: transparent;
 }
 </style>
