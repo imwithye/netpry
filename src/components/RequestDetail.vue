@@ -1,13 +1,13 @@
 <template>
   <el-tabs type="border-card">
     <el-tab-pane class="no-padding" label="Headers">
-      <HeadersTab />
+      <HeadersTab v-if="requestDetails" />
     </el-tab-pane>
     <el-tab-pane class="no-padding" label="Payload">
-      <PayloadTab />
+      <PayloadTab v-if="requestDetails" />
     </el-tab-pane>
     <el-tab-pane class="no-padding" label="Preview">
-      <PreviewTab />
+      <PreviewTab v-if="requestDetails" />
     </el-tab-pane>
     <el-tab-pane class="no-padding" label="Response">Response</el-tab-pane>
   </el-tabs>
@@ -17,6 +17,12 @@
 import HeadersTab from '../views/tabs/HeadersTab.vue'
 import PayloadTab from '../views/tabs/PayloadTab.vue'
 import PreviewTab from '../views/tabs/PreviewTab.vue'
+
+import { computed } from 'vue'
+import { useRequestDetailsStore } from '../store/request_details_store'
+
+const requestDetailsStore = useRequestDetailsStore()
+const requestDetails = computed(() => requestDetailsStore.activatedRequestDetails)
 </script>
 
 <style scoped>
