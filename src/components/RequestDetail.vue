@@ -1,15 +1,15 @@
 <template>
   <el-tabs type="border-card">
-    <el-tab-pane class="no-padding" label="Headers">
+    <el-tab-pane label="Headers">
       <HeadersTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane class="no-padding" label="Payload">
+    <el-tab-pane label="Payload">
       <PayloadTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane class="no-padding" label="Preview">
+    <el-tab-pane label="Preview">
       <PreviewTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane class="no-padding" label="Response">
+    <el-tab-pane class="w-full h-full" label="Response">
       <ResponseTab v-if="requestDetails" />
     </el-tab-pane>
   </el-tabs>
@@ -29,7 +29,7 @@ const requestDetails = computed(() => requestDetailsStore.activatedRequestDetail
 </script>
 
 <style scoped>
-.no-padding {
-  margin: -15px;
+:deep(.el-tabs__content) {
+  padding: 0 !important;
 }
 </style>

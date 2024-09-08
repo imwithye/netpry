@@ -9,6 +9,8 @@ export interface RequestDetails {
   status_code: number | null
   request_headers: { [key: string]: string }
   response_headers: { [key: string]: string }
+  request_body: string | null
+  response_body: string | null
   start_time: string
   end_time: string | null
 }
