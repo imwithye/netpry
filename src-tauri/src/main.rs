@@ -11,7 +11,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let app = tauri::Builder::default().setup(|app| {
         let app_handle = app.handle().clone();
         task::spawn(async move {
-            let _ = proxy_server::ProxyServer::new("127.0.0.1:8080", app_handle)
+            let _ = proxy_server::ProxyServer::new("127.0.0.1:9090", app_handle)
                 .run()
                 .await;
         });

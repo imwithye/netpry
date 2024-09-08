@@ -50,7 +50,7 @@ impl ProxyServer {
         let mut request_details = super::RequestDetails::new();
 
         let method: reqwest::Method = req.method().as_str().parse()?;
-        let uri = format!("https://google.com{}", req.uri());
+        let uri = format!("https://stage.akuity.io{}", req.uri());
 
         request_details.method = method.clone();
         request_details.uri = uri.clone().parse().unwrap();
