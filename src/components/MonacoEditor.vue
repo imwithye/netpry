@@ -36,7 +36,17 @@ onMounted(() => {
 
 watch(
   () => props.value,
-  (_, after) => console.log(after)
+  () => {
+    if (!editorInstance.value) return
+    monaco.editor.getModel(editorInstance.value?.getModel()?.uri!)?.setValue(props.value)
+  }
+)
+watch(
+  () => props.language,
+  () => {
+    if (!editorInstance.value) return
+    monaco.editor.setModelLanguage(editorInstance.value?.getModel()!, props.language || '')
+  }
 )
 watch(
   () => isDark.value,
