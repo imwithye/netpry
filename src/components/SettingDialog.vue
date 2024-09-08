@@ -36,7 +36,11 @@ const backend = ref('')
 const proxyStatusStore = useProxyStore()
 
 const onConfirm = async () => {
-  await proxyStatusStore.run(ingress.value, backend.value)
-  $emit('close')
+  try {
+    await proxyStatusStore.run(ingress.value, backend.value)
+    $emit('close')
+  } catch (error) {
+    console.log(error)
+  }
 }
 </script>

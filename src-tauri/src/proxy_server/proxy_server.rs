@@ -1,57 +1,85 @@
+use actix_web::dev::ServerHandle;
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
 use futures::stream::StreamExt;
 use reqwest::{header::HeaderMap, header::HeaderName, header::HeaderValue, Client};
 use std::error::Error;
-use std::sync::{Arc, RwLock};
-use tauri::AppHandle;
+use std::sync::{Arc, Mutex};
+use actix_web::middleware::Logger;
+use tauri::{AppHandle, Manager};
+use tokio::task;
 
 pub struct ProxyServer {
-    store: Arc<RwLock<super::Store>>,
+    app_handle: AppHandle,
+
+    ingress: Option<String>,
+    backend: Option<String>,
+    server_handle: Option<ServerHandle>,
 }
 
 impl ProxyServer {
     pub fn new(app_handle: AppHandle) -> ProxyServer {
         ProxyServer {
-            store: Arc::new(RwLock::new(super::Store::new(app_handle))),
+            app_handle,
+
+            ingress: None,
+            backend: None,
+            server_handle: None,
         }
     }
 
-    pub async fn run(&mut self) -> Result<(), Box<dyn Error>> {
-        self.store
-            .write()
-            .map_err(|_| "Failed to acquire write lock")?
-            .run()?;
+    pub fn is_running(&self) -> bool {
+        if self.server_handle.is_some() {
+            true
+        } else {
+            false
+        }
+    }
 
-        let addr = "".to_string();
-        let store = Arc::clone(&self.store);
-        let http_server = HttpServer::new(move || {
-            let store = Arc::clone(&store);
+    pub fn run(&mut self, ingress: String, backend: String) -> Result<(), String> {
+        if self.server_handle.is_some() {
+            return Err("Proxy is already running".to_string());
+        }
+
+        self.ingress = Some(ingress.clone());
+        self.backend = Some(backend.clone());
+
+        let app_handle = Arc::new(Mutex::new(self.app_handle.clone()));
+        let backend = Arc::new(Mutex::new(self.backend.as_ref().unwrap().clone()));
+        let srv = HttpServer::new(move || {
+            let app_handle = app_handle.clone();
+            let backend = backend.clone();
             App::new().default_service(web::get().to(move |req, payload| {
-                let store = Arc::clone(&store);
-                async move { ProxyServer::proxy(store, req, payload).await }
+                let app_handle = app_handle.clone();
+                let backend = backend.clone();
+                async move {
+                    let app_handle_guard = app_handle.lock().map_err(|err| err.to_string())?;
+                    let backend_guard = backend.lock().map_err(|err| err.to_string())?;
+                    ProxyServer::proxy(app_handle_guard.clone(), backend_guard.clone(), req, payload).await
+                }
             }))
-        });
-        let http_server = http_server
-            .bind(addr)
-            .map_err(|_| "Failed to bind address")?;
-        Ok(http_server
-            .run()
-            .await
-            .map_err(|_| "Failed to run http server")?)
+        })
+        .bind(ingress.clone())
+        .map_err(|err| format!("Invalid ingress address: {}", err.to_string()))?
+        .run();
+        let srv_handle = srv.handle();
+        task::spawn(srv);
+        self.server_handle = Some(srv_handle);
+        Ok(())
     }
 
     async fn proxy(
-        store: Arc<RwLock<super::Store>>,
+        app_handle: AppHandle,
+        backend: String,
         req: HttpRequest,
         mut payload: web::Payload,
     ) -> Result<HttpResponse, Box<dyn Error>> {
         let mut request_details = super::RequestDetails::new();
 
         let method: reqwest::Method = req.method().as_str().parse()?;
-        let uri = format!("https://stage.akuity.io{}", req.uri());
+        let uri = format!("{}{}", backend, req.uri());
 
         request_details.method = method.clone();
-        request_details.uri = uri.clone().parse().unwrap();
+        request_details.uri = uri.clone().parse()?;
 
         let client = Client::new();
         let mut forward_req = client.request(method.clone(), &uri);
@@ -70,11 +98,9 @@ impl ProxyServer {
             forward_req = forward_req.body(body);
         }
 
-        store
-            .read()
-            .map_err(|_| "Failed to acquire read lock")?
-            .send(request_details.clone())
-            .await;
+        app_handle
+            .emit_all("update", request_details.clone())
+            .map_err(|err| err.to_string())?;
 
         let resp = forward_req
             .send()
@@ -106,11 +132,9 @@ impl ProxyServer {
         request_details.response_body = Some(body.to_vec());
         request_details.end_time = Some(time::OffsetDateTime::now_utc());
 
-        store
-            .read()
-            .map_err(|_| "Failed to acquire read lock")?
-            .send(request_details.clone())
-            .await;
+        app_handle
+            .emit_all("update", request_details.clone())
+            .map_err(|err| err.to_string())?;
 
         Ok(client_resp.body(body))
     }

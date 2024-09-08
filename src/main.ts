@@ -30,8 +30,3 @@ const requestDetailsStore = useRequestDetailsStore()
 listen('update', (event) => {
   requestDetailsStore.addRequestDetails(event.payload as RequestDetails)
 }).then()
-const serverStatusStore = useProxyStore()
-listen('server', (event) => {
-  console.log(serverStatusStore)
-  console.log(event)
-}).then()

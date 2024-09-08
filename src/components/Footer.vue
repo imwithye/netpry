@@ -8,10 +8,10 @@
         class="mr-2"
         style="border-radius: 50%; width: 10px; height: 10px"
         :style="{
-          backgroundColor: isServerRunning ? 'var(--el-color-success)' : 'var(--el-color-danger)'
+          backgroundColor: isProxyRunning ? 'var(--el-color-success)' : 'var(--el-color-danger)'
         }"
       ></div>
-      Proxy {{ isServerRunning ? '' : 'Not' }} Running
+      Proxy {{ isProxyRunning ? '' : 'Not' }} Running
     </div>
     <div class="w-[128px] flex justify-end items-center">
       <el-link type="info" href="https://github.com/imwithye/netpry" target="_blank">
@@ -26,8 +26,8 @@ import { useProxyStore } from '../store/proxy_store'
 import { useRequestDetailsStore } from '../store/request_details_store'
 import { computed } from 'vue'
 
-const serverStatusStore = useProxyStore()
-const isServerRunning = computed(() => serverStatusStore.isProxyRunning)
+const proxyStore = useProxyStore()
+const isProxyRunning = computed(() => proxyStore.isRunning)
 const requestDetailsStore = useRequestDetailsStore()
 const requestCount = computed(() => requestDetailsStore.requestDetailsList.length)
 </script>

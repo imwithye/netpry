@@ -3,19 +3,19 @@ import { ref } from 'vue'
 import { invoke } from '@tauri-apps/api/tauri'
 
 export const useProxyStore = defineStore('proxy', () => {
-  const isProxyRunning = ref(false)
+  const isRunning = ref(false)
 
   async function run(ingress: string, backend: string) {
-    return invoke('cmd_proxy_run', { ingress, backend })
-  }
-
-  function setProxyRunning(value: boolean) {
-    isProxyRunning.value = value
+    try {
+      await invoke('cmd_proxy_run', { ingress, backend })
+      isRunning.value = true
+    } catch (error) {
+      throw error
+    }
   }
 
   return {
-    isProxyRunning,
-    run,
-    setProxyRunning
+    isRunning,
+    run
   }
 })
