@@ -6,14 +6,12 @@ use std::sync::{Arc, RwLock};
 use tauri::AppHandle;
 
 pub struct ProxyServer {
-    addr: String,
     store: Arc<RwLock<super::Store>>,
 }
 
 impl ProxyServer {
-    pub fn new(addr: &str, app_handle: AppHandle) -> ProxyServer {
+    pub fn new(app_handle: AppHandle) -> ProxyServer {
         ProxyServer {
-            addr: addr.to_string(),
             store: Arc::new(RwLock::new(super::Store::new(app_handle))),
         }
     }
@@ -24,7 +22,7 @@ impl ProxyServer {
             .map_err(|_| "Failed to acquire write lock")?
             .run()?;
 
-        let addr = self.addr.clone();
+        let addr = "".to_string();
         let store = Arc::clone(&self.store);
         let http_server = HttpServer::new(move || {
             let store = Arc::clone(&store);

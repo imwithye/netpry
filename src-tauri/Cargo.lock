@@ -2093,6 +2093,7 @@ dependencies = [
  "futures",
  "http 1.1.0",
  "http-serde",
+ "lazy_static",
  "reqwest",
  "serde",
  "serde_json",

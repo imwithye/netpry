@@ -12,7 +12,8 @@ import App from './App.vue'
 import './assets/style.css'
 
 import { listen } from '@tauri-apps/api/event'
-import { RequestDetails, useRequestDetailsStore } from './store/request_details_store.ts'
+import { RequestDetails, useRequestDetailsStore } from './store/request_details_store'
+import { useProxyStore } from './store/proxy_store'
 
 const pinia = createPinia()
 const app = createApp(App)
@@ -26,6 +27,11 @@ app.use(router)
 app.mount('#app')
 
 const requestDetailsStore = useRequestDetailsStore()
-await listen('update', (event) => {
+listen('update', (event) => {
   requestDetailsStore.addRequestDetails(event.payload as RequestDetails)
-})
+}).then()
+const serverStatusStore = useProxyStore()
+listen('server', (event) => {
+  console.log(serverStatusStore)
+  console.log(event)
+}).then()
