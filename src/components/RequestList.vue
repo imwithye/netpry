@@ -3,10 +3,20 @@
     class="h-full border-t border-b overflow-hidden"
     style="border-color: var(--el-border-color)"
   >
+    <div
+      class="flex items-center w-full px-2 border-b"
+      style="border-color: var(--el-border-color)"
+    >
+      <el-icon>
+        <Filter />
+      </el-icon>
+      <el-input v-model="filter" class="no-border-input" placeholder="Filter..." clearable />
+    </div>
+
     <el-table
       class="w-full"
       height="100%"
-      :data="requestDetailsStore.requestDetailsList"
+      :data="filteredRequestDetailsList"
       :row-class-name="tableRowClassName"
       @row-click="(row: RequestDetails) => setActivatedRequestDetails(row)"
     >
@@ -33,9 +43,19 @@
 import { RequestDetails, useRequestDetailsStore } from '../store/request_details_store.ts'
 import MethodTag from './MethodTag.vue'
 import URI from './URI.vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { Filter } from '@element-plus/icons-vue'
+
+const filter = ref<string>('')
 
 const requestDetailsStore = useRequestDetailsStore()
+
+const filteredRequestDetailsList = computed(() => {
+  const list = requestDetailsStore.requestDetailsList
+  if (!filter.value) return list
+  return list.filter((item) => item.uri.indexOf(filter.value) > -1)
+})
+
 const requestDetails = computed(() => requestDetailsStore.activatedRequestDetails)
 
 const setActivatedRequestDetails = (row: RequestDetails) => {
@@ -53,5 +73,17 @@ const tableRowClassName = ({ row }: { row: RequestDetails }) => {
 <style scoped>
 :deep(.active-row) {
   background-color: var(--el-table-current-row-bg-color);
+}
+
+.no-border-input :deep(.el-input__inner) {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.no-border-input :deep(.el-input__wrapper) {
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 </style>
