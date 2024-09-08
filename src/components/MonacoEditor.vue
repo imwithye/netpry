@@ -7,7 +7,9 @@ import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
 import { ref, onMounted, watch } from 'vue'
 import { useDark } from '@vueuse/core'
 
-const isDark = useDark()
+const isDark = useDark({
+  disableTransition: false
+})
 const props = defineProps({
   value: {
     type: String,
