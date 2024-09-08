@@ -19,7 +19,13 @@ export const useRequestDetailsStore = defineStore('requestDetails', () => {
   const requestDetailsMap = new Map<string, number>()
 
   const activatedRequestDetails = ref<RequestDetails | null>(null)
-  const requestDetailsList = ref<Array<RequestDetails>>(Samples as unknown as Array<RequestDetails>)
+  let samples = Samples as unknown as Array<RequestDetails>
+  const requestDetailsList = ref<Array<RequestDetails>>([
+    ...samples,
+    ...samples,
+    ...samples,
+    ...samples
+  ])
 
   function addRequestDetails(requestDetails: RequestDetails) {
     if (!requestDetails) return

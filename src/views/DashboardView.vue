@@ -2,10 +2,10 @@
   <div class="w-full h-full flex flex-col">
     <NavBar />
 
-    <div class="flex-grow w-full">
+    <div class="flex-grow w-full overflow-hidden">
       <div class="w-full h-full flex">
-        <RequestList class="w-1/3" />
-        <RequestDetail class="w-2/3" />
+        <RequestList class="w-1/3 h-full" />
+        <RequestDetail class="w-2/3 h-full" />
       </div>
     </div>
 

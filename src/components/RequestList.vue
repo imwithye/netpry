@@ -5,6 +5,7 @@
   >
     <el-table
       class="w-full"
+      height="100%"
       :data="requestDetailsStore.requestDetailsList"
       row-class-name="cursor-pointer"
       @row-click="(row: RequestDetails) => setActivatedRequestDetails(row)"

@@ -1,5 +1,7 @@
 <template>
-  <Section title="Query String Parameters"> </Section>
+  <el-scrollbar height="100%">
+    <Section title="Query String Parameters"> </Section>
+  </el-scrollbar>
 </template>
 
 <script setup lang="ts">

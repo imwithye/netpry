@@ -1,12 +1,12 @@
 <template>
   <el-tabs type="border-card">
-    <el-tab-pane label="Headers">
+    <el-tab-pane class="w-full h-full" label="Headers">
       <HeadersTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane label="Payload">
+    <el-tab-pane class="w-full h-full" label="Payload">
       <PayloadTab v-if="requestDetails" />
     </el-tab-pane>
-    <el-tab-pane label="Preview">
+    <el-tab-pane class="w-full h-full" label="Preview">
       <PreviewTab v-if="requestDetails" />
     </el-tab-pane>
     <el-tab-pane class="w-full h-full" label="Response">
