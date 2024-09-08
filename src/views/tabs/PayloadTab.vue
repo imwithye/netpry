@@ -6,9 +6,9 @@
         <div class="value">{{ param.value }}</div>
       </div>
     </Section>
-    <Section title="Request Body">
+    <Section title="Request Body" v-if="body">
       <div class="w-full h-[320px]">
-        <MonacoEditor :value="`console.log('Hello World!')`" />
+        <MonacoEditor :value="body" />
       </div>
     </Section>
   </el-scrollbar>
@@ -21,9 +21,11 @@ import Section from '../../components/Section.vue'
 import MonacoEditor from '../../components/MonacoEditor.vue'
 
 const requestDetailsStore = useRequestDetailsStore()
+
 const requestDetails = computed(() => {
   return requestDetailsStore.activatedRequestDetails
 })
+
 const queryStringParameters = computed(() => {
   const uri = requestDetails.value?.uri
   if (!uri) return new Array<{ key: string; value: string }>()
@@ -34,6 +36,15 @@ const queryStringParameters = computed(() => {
     queryParams.push({ key, value })
   })
   return queryParams
+})
+
+const body = computed(() => {
+  const details = requestDetailsStore.activatedRequestDetails
+  if (!details) {
+    return ''
+  }
+  const encodedBody = details.request_body || ''
+  return atob(encodedBody)
 })
 </script>
 
