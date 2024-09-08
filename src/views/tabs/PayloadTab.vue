@@ -6,6 +6,11 @@
         <div class="value">{{ param.value }}</div>
       </div>
     </Section>
+    <Section title="Request Body">
+      <div class="w-full h-[320px]">
+        <MonacoEditor :value="`console.log('Hello World!')`" />
+      </div>
+    </Section>
   </el-scrollbar>
 </template>
 
@@ -13,6 +18,7 @@
 import { computed } from 'vue'
 import { useRequestDetailsStore } from '../../store/request_details_store'
 import Section from '../../components/Section.vue'
+import MonacoEditor from '../../components/MonacoEditor.vue'
 
 const requestDetailsStore = useRequestDetailsStore()
 const requestDetails = computed(() => {
