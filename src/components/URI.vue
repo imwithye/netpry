@@ -1,6 +1,13 @@
 <template>
-  <el-tooltip effect="dark" placement="top" :content="uri" :visible="visible">
+  <el-tooltip
+    effect="dark"
+    placement="top"
+    :content="`<div class='break-all' style='max-width: 80vw'>${uri}</div>`"
+    raw-content
+    :visible="visible"
+  >
     <div
+      style="max-width: 80vw"
       class="truncate text-xs font-mono"
       @mouseenter="visible = true"
       @mouseleave="visible = false"

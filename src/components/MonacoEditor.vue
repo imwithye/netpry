@@ -36,7 +36,7 @@ onMounted(() => {
 
 watch(
   () => props.value,
-  (_, after) => editorInstance.value?.setValue(after)
+  (_, after) => console.log(after)
 )
 watch(
   () => isDark.value,
