@@ -4,7 +4,7 @@ use futures::stream::StreamExt;
 use reqwest::{header::HeaderMap, header::HeaderName, header::HeaderValue, Client};
 use std::error::Error;
 use std::sync::{Arc, Mutex};
-use actix_web::middleware::Logger;
+use reqwest::redirect::Policy;
 use tauri::{AppHandle, Manager};
 use tokio::task;
 
@@ -78,10 +78,12 @@ impl ProxyServer {
         let method: reqwest::Method = req.method().as_str().parse()?;
         let uri = format!("{}{}", backend, req.uri());
 
+        println!("{} - {}", method, uri);
+
         request_details.method = method.clone();
         request_details.uri = uri.clone().parse()?;
 
-        let client = Client::new();
+        let client = Client::builder().redirect(Policy::none()).build()?;
         let mut forward_req = client.request(method.clone(), &uri);
         let mut headers = HeaderMap::new();
         for (name, value) in req.headers().iter() {

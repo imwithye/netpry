@@ -30,8 +30,8 @@ defineProps({
 
 const $emit = defineEmits(['close'])
 
-const ingress = ref('')
-const backend = ref('')
+const ingress = ref('127.0.0.1:9090')
+const backend = ref('http://127.0.0.1:9091')
 
 const proxyStatusStore = useProxyStore()
 
